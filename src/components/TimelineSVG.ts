@@ -630,7 +630,7 @@ function setupPanZoom(wrapper: HTMLElement, svg: SVGElement): void {
 }
 
 function createSVGElement(tag: string, attrs?: Record<string, string>): SVGElement {
-    const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    const el = activeDocument.createElementNS("http://www.w3.org/2000/svg", tag);
     if (attrs) {
         for (const [k, v] of Object.entries(attrs)) {
             el.setAttribute(k, v);

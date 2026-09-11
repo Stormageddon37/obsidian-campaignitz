@@ -55,7 +55,7 @@ export default class CampaignitzPlugin extends Plugin {
     }
 
     async loadSettings(): Promise<void> {
-        const loaded: Partial<CampaignitzSettings> = (await this.loadData()) ?? {};
+        const loaded = ((await this.loadData()) ?? {}) as Partial<CampaignitzSettings>;
         this.settings = Object.assign({}, DEFAULT_SETTINGS, loaded);
     }
 
@@ -63,7 +63,7 @@ export default class CampaignitzPlugin extends Plugin {
         await this.saveData(this.settings);
     }
 
-    async activateView(): Promise<void> {
+    activateView(): void {
         const existing = this.app.workspace.getLeavesOfType(VIEW_TYPE_CAMPAIGN_TIMELINE);
         if (existing.length) {
             this.app.workspace.revealLeaf(existing[0]);
@@ -71,10 +71,11 @@ export default class CampaignitzPlugin extends Plugin {
         }
 
         const leaf = this.app.workspace.getLeaf("tab");
-        await leaf.setViewState({
+        void leaf.setViewState({
             type: VIEW_TYPE_CAMPAIGN_TIMELINE,
             active: true,
+        }).then(() => {
+            this.app.workspace.revealLeaf(leaf);
         });
-        this.app.workspace.revealLeaf(leaf);
     }
 }

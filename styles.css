@@ -132,8 +132,8 @@
     pointer-events: none;
 }
 
-.campaignitz-session-track-label {
-    fill: var(--text-muted) !important;
+.campaignitz-session-track .campaignitz-session-track-label {
+    fill: var(--text-muted);
 }
 
 .campaignitz-here-arrow {

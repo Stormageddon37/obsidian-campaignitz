@@ -1,4 +1,4 @@
-import { App, PluginSettingTab, Setting } from "obsidian";
+import { App, PluginSettingTab, Setting, type SettingDefinitionItem } from "obsidian";
 import type CampaignitzPlugin from "./main";
 import { PlotlineConfig, DEFAULT_PLOTLINE_COLORS } from "./models/types";
 
@@ -30,53 +30,78 @@ export class CampaignitzSettingTab extends PluginSettingTab {
         this.plugin = plugin;
     }
 
-    display(): void {
-        const { containerEl } = this;
-        containerEl.empty();
+    getControlValue(key: string): unknown {
+        const s = this.plugin.settings;
+        switch (key) {
+            case "canonEventsPath": return s.canonEventsPath;
+            case "sessionsFolder": return s.sessionsFolder;
+            case "actCount": return s.actCount;
+            case "sessionDateField": return s.sessionDateField;
+            default: return undefined;
+        }
+    }
 
-        new Setting(containerEl)
-            .setName("Canon Events file")
-            .setDesc("Path to the markdown file listing canon events by act")
-            .addText((text) =>
-                text
-                    .setPlaceholder("Plot/Lines/Canon Events.md")
-                    .setValue(this.plugin.settings.canonEventsPath)
-                    .onChange(async (value) => {
-                        this.plugin.settings.canonEventsPath = value;
-                        await this.plugin.saveSettings();
-                    })
-            );
+    async setControlValue(key: string, value: unknown): Promise<void> {
+        const s = this.plugin.settings;
+        switch (key) {
+            case "canonEventsPath": s.canonEventsPath = value as string; break;
+            case "sessionsFolder": s.sessionsFolder = value as string; break;
+            case "actCount": s.actCount = value as number; break;
+            case "sessionDateField": s.sessionDateField = value as string; break;
+        }
+        await this.plugin.saveSettings();
+    }
 
-        new Setting(containerEl)
-            .setName("Sessions folder")
-            .setDesc("Folder containing session notes (searched recursively)")
-            .addText((text) =>
-                text
-                    .setPlaceholder("Plot/Acts")
-                    .setValue(this.plugin.settings.sessionsFolder)
-                    .onChange(async (value) => {
-                        this.plugin.settings.sessionsFolder = value;
-                        await this.plugin.saveSettings();
-                    })
-            );
+    getSettingDefinitions(): SettingDefinitionItem[] {
+        return [
+            {
+                name: "Canon Events file",
+                desc: "Path to the markdown file listing canon events by act",
+                control: {
+                    type: "text" as const,
+                    key: "canonEventsPath",
+                    placeholder: "Plot/Lines/Canon Events.md",
+                },
+            },
+            {
+                name: "Sessions folder",
+                desc: "Folder containing session notes (searched recursively)",
+                control: {
+                    type: "text" as const,
+                    key: "sessionsFolder",
+                    placeholder: "Plot/Acts",
+                },
+            },
+            {
+                name: "Number of acts",
+                desc: "How many acts your campaign has (1-6)",
+                control: {
+                    type: "slider" as const,
+                    key: "actCount",
+                    min: 1,
+                    max: 6,
+                    step: 1,
+                },
+            },
+            {
+                name: "Plotlines",
+                render: (setting: Setting) => {
+                    this.renderPlotlines(setting.settingEl);
+                },
+            },
+            {
+                name: "Session date field",
+                desc: "Frontmatter key used for the real-world session date",
+                control: {
+                    type: "text" as const,
+                    key: "sessionDateField",
+                    placeholder: "played_on",
+                },
+            },
+        ];
+    }
 
-        new Setting(containerEl)
-            .setName("Number of acts")
-            .setDesc("How many acts your campaign has (1-6)")
-            .addSlider((slider) =>
-                slider
-                    .setLimits(1, 6, 1)
-                    .setValue(this.plugin.settings.actCount)
-                    .onChange(async (value) => {
-                        this.plugin.settings.actCount = value;
-                        await this.plugin.saveSettings();
-                    })
-            );
-
-        new Setting(containerEl)
-            .setName("Plotlines")
-            .setHeading();
-
+    private renderPlotlines(containerEl: HTMLElement): void {
         for (let i = 0; i < this.plugin.settings.plotlines.length; i++) {
             const pl = this.plugin.settings.plotlines[i];
             const s = new Setting(containerEl)
@@ -106,7 +131,7 @@ export class CampaignitzSettingTab extends PluginSettingTab {
                         .onClick(async () => {
                             this.plugin.settings.plotlines.splice(i, 1);
                             await this.plugin.saveSettings();
-                            this.display();
+                            this.update();
                         })
                 );
             }
@@ -125,22 +150,9 @@ export class CampaignitzSettingTab extends PluginSettingTab {
                             color: DEFAULT_PLOTLINE_COLORS[idx] || "#888888",
                         });
                         await this.plugin.saveSettings();
-                        this.display();
+                        this.update();
                     })
             );
         }
-
-        new Setting(containerEl)
-            .setName("Session date field")
-            .setDesc("Frontmatter key used for the real-world session date")
-            .addText((text) =>
-                text
-                    .setPlaceholder("played_on")
-                    .setValue(this.plugin.settings.sessionDateField)
-                    .onChange(async (value) => {
-                        this.plugin.settings.sessionDateField = value;
-                        await this.plugin.saveSettings();
-                    })
-            );
     }
 }

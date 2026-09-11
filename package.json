@@ -1,6 +1,6 @@
 {
   "name": "obsidian-campaignitz",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Campaign plot timeline visualization for tabletop RPGs",
   "main": "main.js",
   "scripts": {
