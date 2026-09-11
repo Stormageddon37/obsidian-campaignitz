@@ -1,4 +1,4 @@
-*
-!.gitignore
-!README.md
-
+node_modules/
+dist/
+*.js.map
+obsidian-storyline/

@@ -1,0 +1,172 @@
+.campaignitz-view {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.campaignitz-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--background-modifier-border);
+    flex-shrink: 0;
+}
+
+.campaignitz-title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-normal);
+}
+
+.campaignitz-refresh-btn {
+    font-size: 12px;
+    padding: 4px 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    border: 1px solid var(--background-modifier-border);
+    background: var(--background-secondary);
+    color: var(--text-muted);
+}
+
+.campaignitz-refresh-btn:hover {
+    background: var(--background-modifier-hover);
+    color: var(--text-normal);
+}
+
+.campaignitz-container {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+}
+
+.campaignitz-svg-wrapper {
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    position: relative;
+    cursor: grab;
+}
+
+.campaignitz-svg {
+    display: block;
+}
+
+.campaignitz-act-label {
+    font-size: 16px;
+    font-weight: 700;
+    fill: var(--text-normal);
+}
+
+.campaignitz-cross-link {
+    stroke: var(--text-faint);
+    stroke-width: 2;
+    stroke-dasharray: 6, 4;
+    stroke-opacity: 0.6;
+}
+
+.campaignitz-plotline-label {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.campaignitz-grid-line {
+    stroke: var(--background-modifier-border);
+    stroke-width: 1;
+    stroke-dasharray: 6, 4;
+}
+
+.campaignitz-plotline-track {
+    stroke-width: 1;
+    stroke-opacity: 0.2;
+}
+
+.campaignitz-node {
+    transition: transform 0.1s ease;
+}
+
+.campaignitz-node:hover circle {
+    stroke-width: 3.5;
+}
+
+.campaignitz-node-label {
+    font-size: 11px;
+    fill: var(--text-muted);
+    pointer-events: none;
+}
+
+.campaignitz-node:hover .campaignitz-node-label {
+    fill: var(--text-normal);
+    font-weight: 600;
+}
+
+.campaignitz-session-line {
+    stroke: var(--text-faint);
+    stroke-width: 1;
+}
+
+.campaignitz-session-marker {
+    fill: var(--interactive-accent);
+    stroke: var(--background-primary);
+    stroke-width: 2;
+    transition: r 0.1s ease;
+}
+
+.campaignitz-session-tooltip-trigger:hover .campaignitz-session-marker {
+    r: 9;
+}
+
+.campaignitz-session-number {
+    font-size: 10px;
+    fill: var(--text-faint);
+    pointer-events: none;
+}
+
+.campaignitz-session-track-label {
+    fill: var(--text-muted) !important;
+}
+
+.campaignitz-here-arrow {
+    fill: #f1c40f;
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.3));
+}
+
+.campaignitz-here-label {
+    font-size: 10px;
+    font-weight: 800;
+    fill: #f1c40f;
+    letter-spacing: 0.5px;
+}
+
+.campaignitz-you-are-here {
+    animation: campaignitz-pulse 2s ease-in-out infinite;
+}
+
+@keyframes campaignitz-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+.campaignitz-tooltip {
+    position: absolute;
+    background: var(--background-primary);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: var(--text-normal);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    pointer-events: none;
+    z-index: 100;
+    max-width: 300px;
+    line-height: 1.5;
+}
+
+.campaignitz-empty {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 40px;
+    font-size: 14px;
+}

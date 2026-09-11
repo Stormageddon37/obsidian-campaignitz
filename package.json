@@ -1,0 +1,28 @@
+{
+  "name": "obsidian-campaignitz",
+  "version": "1.0.0",
+  "description": "Campaign plot timeline visualization for tabletop RPGs",
+  "main": "main.js",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+    "version": "node version-bump.mjs && git add manifest.json versions.json"
+  },
+  "keywords": [
+    "obsidian",
+    "plugin",
+    "campaign",
+    "ttrpg",
+    "timeline",
+    "plotlines"
+  ],
+  "author": "Nitzan Bresler",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "esbuild": "^0.28.1",
+    "obsidian": "^1.12.3",
+    "tslib": "2.6.2",
+    "typescript": "5.3.3"
+  }
+}
