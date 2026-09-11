@@ -50,6 +50,14 @@
     cursor: grab;
 }
 
+.campaignitz-svg-wrapper.campaignitz-panning {
+    cursor: grabbing;
+}
+
+.campaignitz-clickable {
+    cursor: pointer;
+}
+
 .campaignitz-svg {
     display: block;
 }
@@ -162,6 +170,7 @@
     z-index: 100;
     max-width: 300px;
     line-height: 1.5;
+    white-space: pre-line;
 }
 
 .campaignitz-empty {

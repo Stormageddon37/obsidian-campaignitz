@@ -47,7 +47,7 @@ export class CampaignTimelineView extends ItemView {
         const header = container.createDiv({ cls: "campaignitz-header" });
         const refreshBtn = header.createEl("button", { cls: "campaignitz-refresh-btn" });
         refreshBtn.textContent = "Refresh";
-        refreshBtn.addEventListener("click", () => this.render());
+        refreshBtn.addEventListener("click", () => { void this.render(); });
 
         const title = header.createEl("h4", { cls: "campaignitz-title" });
         title.textContent = "Campaign Timeline";

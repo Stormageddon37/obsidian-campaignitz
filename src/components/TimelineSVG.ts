@@ -44,11 +44,12 @@ export function buildTimelineSVG(
 
     const wrapper = container.createDiv({ cls: "campaignitz-svg-wrapper" });
 
-    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("width", String(totalWidth));
-    svg.setAttribute("height", String(totalHeight));
-    svg.setAttribute("viewBox", `0 0 ${totalWidth} ${totalHeight}`);
-    svg.classList.add("campaignitz-svg");
+    const svg = createSVGElement("svg", {
+        width: String(totalWidth),
+        height: String(totalHeight),
+        viewBox: `0 0 ${totalWidth} ${totalHeight}`,
+        class: "campaignitz-svg",
+    });
     wrapper.appendChild(svg);
 
     const defs = createSVGElement("defs");
@@ -308,7 +309,9 @@ function drawNodes(
 
     for (const pos of positions) {
         const nodeGroup = createSVGElement("g", {
-            class: "campaignitz-node",
+            class: pos.event.filePath
+                ? "campaignitz-node campaignitz-clickable"
+                : "campaignitz-node",
             "data-filepath": pos.event.filePath || "",
         });
 
@@ -353,9 +356,8 @@ function drawNodes(
         }
 
         if (pos.event.filePath) {
-            nodeGroup.style.cursor = "pointer";
             nodeGroup.addEventListener("click", () => {
-                app.workspace.openLinkText(pos.event.filePath!, "", false);
+                void app.workspace.openLinkText(pos.event.filePath!, "", false);
             });
         }
 
@@ -478,7 +480,7 @@ function drawSessionTrack(
         });
 
         const tooltipGroup = createSVGElement("g", {
-            class: "campaignitz-session-tooltip-trigger",
+            class: "campaignitz-session-tooltip-trigger campaignitz-clickable",
             "data-filepath": session.filePath,
         });
         tooltipGroup.appendChild(marker);
@@ -498,17 +500,18 @@ function drawSessionTrack(
             tooltipGroup.appendChild(sessionLabel);
         }
 
-        tooltipGroup.style.cursor = "pointer";
         tooltipGroup.addEventListener("click", () => {
-            app.workspace.openLinkText(session.filePath, "", false);
+            void app.workspace.openLinkText(session.filePath, "", false);
         });
 
         const tooltipData = buildTooltipText(session);
-        tooltipGroup.addEventListener("mouseenter", (e) => {
-            showTooltip(svg.parentElement!, e as MouseEvent, tooltipData);
+        tooltipGroup.addEventListener("mouseenter", (e: Event) => {
+            const parent = svg.parentElement;
+            if (parent) showTooltip(parent, e as MouseEvent, tooltipData);
         });
         tooltipGroup.addEventListener("mouseleave", () => {
-            hideTooltip(svg.parentElement!);
+            const parent = svg.parentElement;
+            if (parent) hideTooltip(parent);
         });
 
         group.appendChild(tooltipGroup);
@@ -557,10 +560,11 @@ function buildTooltipText(session: Session): string {
 function showTooltip(container: HTMLElement, e: MouseEvent, text: string): void {
     hideTooltip(container);
     const tip = container.createDiv({ cls: "campaignitz-tooltip" });
-    tip.style.whiteSpace = "pre-line";
     tip.textContent = text;
-    tip.style.left = `${e.offsetX + 12}px`;
-    tip.style.top = `${e.offsetY - 10}px`;
+    const rect = container.getBoundingClientRect();
+    const offsetX = e.clientX - rect.left;
+    const offsetY = e.clientY - rect.top;
+    tip.setCssStyles({ left: `${offsetX + 12}px`, top: `${offsetY - 10}px` });
 }
 
 function hideTooltip(container: HTMLElement): void {
@@ -584,7 +588,7 @@ function setupPanZoom(wrapper: HTMLElement, svg: SVGElement): void {
         startY = e.clientY;
         scrollLeft = wrapper.scrollLeft;
         scrollTop = wrapper.scrollTop;
-        wrapper.style.cursor = "grabbing";
+        wrapper.addClass("campaignitz-panning");
         e.preventDefault();
     });
 
@@ -596,7 +600,7 @@ function setupPanZoom(wrapper: HTMLElement, svg: SVGElement): void {
 
     const onMouseUp = (): void => {
         isPanning = false;
-        wrapper.style.cursor = "";
+        wrapper.removeClass("campaignitz-panning");
     };
 
     wrapper.ownerDocument.addEventListener("mousemove", onMouseMove);
@@ -621,8 +625,7 @@ function setupPanZoom(wrapper: HTMLElement, svg: SVGElement): void {
         e.preventDefault();
         const delta = e.deltaY > 0 ? 0.9 : 1.1;
         scale = Math.min(3, Math.max(0.3, scale * delta));
-        svg.style.transform = `scale(${scale})`;
-        svg.style.transformOrigin = "0 0";
+        svg.setCssStyles({ transform: `scale(${scale})`, transformOrigin: "0 0" });
     }, { passive: false });
 }
 

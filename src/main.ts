@@ -13,31 +13,29 @@ export default class CampaignitzPlugin extends Plugin {
         this.registerView(VIEW_TYPE_CAMPAIGN_TIMELINE, (leaf) => new CampaignTimelineView(leaf, this));
 
         this.addRibbonIcon("map", "Open Campaign Timeline", () => {
-            this.activateView();
+            void this.activateView();
         });
 
         this.addCommand({
             id: "open-campaign-timeline",
             name: "Open Campaign Timeline",
             callback: () => {
-                this.activateView();
+                void this.activateView();
             },
         });
 
         this.addSettingTab(new CampaignitzSettingTab(this.app, this));
 
         this.registerMarkdownCodeBlockProcessor("campaignitz", async (source, el) => {
-            const lines = source.trim().split("\n").reduce((acc, line) => {
+            const lines = source.trim().split("\n").reduce<Record<string, string>>((acc, line) => {
                 const [key, ...rest] = line.split(":");
                 if (key && rest.length) acc[key.trim()] = rest.join(":").trim();
                 return acc;
-            }, {} as Record<string, string>);
+            }, {});
 
             const height = lines["height"] || "500px";
             el.addClass("campaignitz-embed");
-            el.style.height = height;
-            el.style.overflow = "hidden";
-            el.style.position = "relative";
+            el.setCssStyles({ height, overflow: "hidden", position: "relative" });
 
             const settings = this.settings;
             const { events, actLabels } = await parseCanonEvents(this.app, settings.canonEventsPath);
@@ -56,12 +54,9 @@ export default class CampaignitzPlugin extends Plugin {
         });
     }
 
-    onunload(): void {
-        this.app.workspace.detachLeavesOfType(VIEW_TYPE_CAMPAIGN_TIMELINE);
-    }
-
     async loadSettings(): Promise<void> {
-        this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+        const loaded: Partial<CampaignitzSettings> = (await this.loadData()) ?? {};
+        this.settings = Object.assign({}, DEFAULT_SETTINGS, loaded);
     }
 
     async saveSettings(): Promise<void> {

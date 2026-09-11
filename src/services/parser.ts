@@ -2,7 +2,6 @@ import { App, TFile, TFolder } from "obsidian";
 import { CanonEvent, Session } from "../models/types";
 
 const WIKILINK_RE = /\[\[([^\]]+)\]\]/g;
-const PLOTLINE_PAREN_RE = /\(\[\[([^\]]+)\]\]\)/g;
 const PLOTLINE_MULTI_RE = /\(((?:\[\[[^\]]+\]\](?:,\s*)?)+)\)/g;
 const WIKILINK_INNER_RE = /\[\[([^\]]+)\]\]/g;
 const CHECKBOX_RE = /^(\s*)-\s*\[([ xX])\]\s*/;

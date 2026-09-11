@@ -67,14 +67,15 @@ export class CampaignitzSettingTab extends PluginSettingTab {
                 slider
                     .setLimits(1, 6, 1)
                     .setValue(this.plugin.settings.actCount)
-                    .setDynamicTooltip()
                     .onChange(async (value) => {
                         this.plugin.settings.actCount = value;
                         await this.plugin.saveSettings();
                     })
             );
 
-        containerEl.createEl("h3", { text: "Plotlines" });
+        new Setting(containerEl)
+            .setName("Plotlines")
+            .setHeading();
 
         for (let i = 0; i < this.plugin.settings.plotlines.length; i++) {
             const pl = this.plugin.settings.plotlines[i];
