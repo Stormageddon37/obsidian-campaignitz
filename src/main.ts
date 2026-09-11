@@ -63,7 +63,7 @@ export default class CampaignitzPlugin extends Plugin {
         await this.saveData(this.settings);
     }
 
-    activateView(): void {
+    async activateView(): Promise<void> {
         const existing = this.app.workspace.getLeavesOfType(VIEW_TYPE_CAMPAIGN_TIMELINE);
         if (existing.length) {
             this.app.workspace.revealLeaf(existing[0]);
@@ -71,11 +71,10 @@ export default class CampaignitzPlugin extends Plugin {
         }
 
         const leaf = this.app.workspace.getLeaf("tab");
-        void leaf.setViewState({
+        await leaf.setViewState({
             type: VIEW_TYPE_CAMPAIGN_TIMELINE,
             active: true,
-        }).then(() => {
-            this.app.workspace.revealLeaf(leaf);
         });
+        this.app.workspace.revealLeaf(leaf);
     }
 }
