@@ -1,7 +1,7 @@
 {
   "id": "campaignitz",
   "name": "Campaignitz",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "minAppVersion": "1.13.0",
   "description": "Campaign plot timeline visualization for tabletop RPGs. Track canon events across acts and plotlines, overlay session history, and see where you are.",
   "author": "Nitzan Bresler",
