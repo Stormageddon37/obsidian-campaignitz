@@ -66,7 +66,7 @@ export default class CampaignitzPlugin extends Plugin {
     async activateView(): Promise<void> {
         const existing = this.app.workspace.getLeavesOfType(VIEW_TYPE_CAMPAIGN_TIMELINE);
         if (existing.length) {
-            this.app.workspace.revealLeaf(existing[0]);
+            await this.app.workspace.revealLeaf(existing[0]);
             return;
         }
 
@@ -75,6 +75,6 @@ export default class CampaignitzPlugin extends Plugin {
             type: VIEW_TYPE_CAMPAIGN_TIMELINE,
             active: true,
         });
-        this.app.workspace.revealLeaf(leaf);
+        await this.app.workspace.revealLeaf(leaf);
     }
 }
