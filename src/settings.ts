@@ -1,4 +1,4 @@
-import { App, PluginSettingTab, Setting, type SettingDefinitionItem } from "obsidian";
+import { App, PluginSettingTab, Setting, type SettingDefinitionItem, type SettingGroupItem } from "obsidian";
 import type CampaignitzPlugin from "./main";
 import { PlotlineConfig, DEFAULT_PLOTLINE_COLORS } from "./models/types";
 
@@ -84,10 +84,9 @@ export class CampaignitzSettingTab extends PluginSettingTab {
                 },
             },
             {
-                name: "Plotlines",
-                render: (setting: Setting) => {
-                    this.renderPlotlines(setting.settingEl);
-                },
+                type: "group" as const,
+                heading: "Plotlines",
+                items: this.buildPlotlineItems(),
             },
             {
                 name: "Session date field",
@@ -101,58 +100,73 @@ export class CampaignitzSettingTab extends PluginSettingTab {
         ];
     }
 
-    private renderPlotlines(containerEl: HTMLElement): void {
-        for (let i = 0; i < this.plugin.settings.plotlines.length; i++) {
-            const pl = this.plugin.settings.plotlines[i];
-            const s = new Setting(containerEl)
-                .setName(`Plotline ${i + 1}`)
-                .addText((text) =>
-                    text
-                        .setPlaceholder("ID (e.g. A)")
-                        .setValue(pl.id)
-                        .onChange(async (value) => {
-                            this.plugin.settings.plotlines[i].id = value;
-                            this.plugin.settings.plotlines[i].name = value;
-                            await this.plugin.saveSettings();
-                        })
-                )
-                .addColorPicker((cp) =>
-                    cp.setValue(pl.color).onChange(async (value) => {
-                        this.plugin.settings.plotlines[i].color = value;
-                        await this.plugin.saveSettings();
-                    })
-                );
+    private buildPlotlineItems(): SettingGroupItem[] {
+        const items: SettingGroupItem[] = [];
 
-            if (this.plugin.settings.plotlines.length > 1) {
-                s.addExtraButton((btn) =>
-                    btn
-                        .setIcon("trash")
-                        .setTooltip("Remove plotline")
-                        .onClick(async () => {
-                            this.plugin.settings.plotlines.splice(i, 1);
-                            await this.plugin.saveSettings();
-                            this.update();
-                        })
-                );
-            }
+        for (let i = 0; i < this.plugin.settings.plotlines.length; i++) {
+            const idx = i;
+            items.push({
+                name: `Plotline ${idx + 1}`,
+                render: (setting: Setting) => {
+                    const pl = this.plugin.settings.plotlines[idx];
+                    if (!pl) return;
+                    setting
+                        .addText((text) =>
+                            text
+                                .setPlaceholder("ID (e.g. A)")
+                                .setValue(pl.id)
+                                .onChange(async (value) => {
+                                    this.plugin.settings.plotlines[idx].id = value;
+                                    this.plugin.settings.plotlines[idx].name = value;
+                                    await this.plugin.saveSettings();
+                                })
+                        )
+                        .addColorPicker((cp) =>
+                            cp.setValue(pl.color).onChange(async (value) => {
+                                this.plugin.settings.plotlines[idx].color = value;
+                                await this.plugin.saveSettings();
+                            })
+                        );
+
+                    if (this.plugin.settings.plotlines.length > 1) {
+                        setting.addExtraButton((btn) =>
+                            btn
+                                .setIcon("trash")
+                                .setTooltip("Remove plotline")
+                                .onClick(async () => {
+                                    this.plugin.settings.plotlines.splice(idx, 1);
+                                    await this.plugin.saveSettings();
+                                    this.update();
+                                })
+                        );
+                    }
+                },
+            });
         }
 
         if (this.plugin.settings.plotlines.length < 6) {
-            new Setting(containerEl).addButton((btn) =>
-                btn
-                    .setButtonText("Add plotline")
-                    .setCta()
-                    .onClick(async () => {
-                        const idx = this.plugin.settings.plotlines.length;
-                        this.plugin.settings.plotlines.push({
-                            id: String.fromCharCode(65 + idx),
-                            name: String.fromCharCode(65 + idx),
-                            color: DEFAULT_PLOTLINE_COLORS[idx] || "#888888",
-                        });
-                        await this.plugin.saveSettings();
-                        this.update();
-                    })
-            );
+            items.push({
+                name: "",
+                render: (setting: Setting) => {
+                    setting.addButton((btn) =>
+                        btn
+                            .setButtonText("Add plotline")
+                            .setCta()
+                            .onClick(async () => {
+                                const nextIdx = this.plugin.settings.plotlines.length;
+                                this.plugin.settings.plotlines.push({
+                                    id: String.fromCharCode(65 + nextIdx),
+                                    name: String.fromCharCode(65 + nextIdx),
+                                    color: DEFAULT_PLOTLINE_COLORS[nextIdx] || "#888888",
+                                });
+                                await this.plugin.saveSettings();
+                                this.update();
+                            })
+                    );
+                },
+            });
         }
+
+        return items;
     }
 }
