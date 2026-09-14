@@ -51,6 +51,23 @@ export default class CampaignitzPlugin extends Plugin {
             };
 
             buildTimelineSVG(el, data, this.app);
+
+            let resizeTimer: number | null = null;
+            let lastWidth = el.clientWidth;
+            const observer = new ResizeObserver(() => {
+                const w = el.clientWidth;
+                if (w === lastWidth || w === 0 || lastWidth === 0) {
+                    lastWidth = w;
+                    return;
+                }
+                lastWidth = w;
+                if (resizeTimer) window.clearTimeout(resizeTimer);
+                resizeTimer = window.setTimeout(() => {
+                    buildTimelineSVG(el, data, this.app);
+                }, 150);
+            });
+            observer.observe(el);
+            this.register(() => observer.disconnect());
         });
     }
 

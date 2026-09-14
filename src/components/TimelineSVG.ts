@@ -36,11 +36,16 @@ export function buildTimelineSVG(
     const hasUnassigned = events.some((e) => e.plotlines.length === 0);
     const totalRows = plotlines.length + (hasUnassigned ? 1 : 0);
 
-    const contentWidth = Math.max(acts.length * MIN_COL_WIDTH, container.clientWidth - PADDING.left - PADDING.right);
+    const minContentWidth = acts.length * MIN_COL_WIDTH;
+    const availableWidth = container.clientWidth - PADDING.left - PADDING.right;
+    const contentWidth = Math.max(minContentWidth, availableWidth);
     const colWidth = contentWidth / acts.length;
     const contentHeight = totalRows * ROW_HEIGHT;
     const totalWidth = PADDING.left + contentWidth + PADDING.right;
     const totalHeight = PADDING.top + contentHeight + SESSION_TRACK_Y_OFFSET + PADDING.bottom;
+
+    const uid = `cz-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    const shadowId = `node-shadow-${uid}`;
 
     const wrapper = container.createDiv({ cls: "campaignitz-svg-wrapper" });
 
@@ -53,18 +58,7 @@ export function buildTimelineSVG(
     wrapper.appendChild(svg);
 
     const defs = createSVGElement("defs");
-    const marker = createSVGElement("marker", {
-        id: "arrow-here",
-        markerWidth: "10",
-        markerHeight: "7",
-        refX: "5",
-        refY: "3.5",
-        orient: "auto",
-    });
-    marker.appendChild(createSVGElement("polygon", { points: "0 0, 10 3.5, 0 7", fill: "#f1c40f" }));
-    defs.appendChild(marker);
-
-    const filter = createSVGElement("filter", { id: "node-shadow", x: "-50%", y: "-50%", width: "200%", height: "200%" });
+    const filter = createSVGElement("filter", { id: shadowId, x: "-50%", y: "-50%", width: "200%", height: "200%" });
     filter.appendChild(createSVGElement("feDropShadow", { dx: "0", dy: "1", stdDeviation: "2", "flood-opacity": "0.3" }));
     defs.appendChild(filter);
     svg.appendChild(defs);
@@ -74,7 +68,7 @@ export function buildTimelineSVG(
     const nodePositions = computeNodePositions(events, plotlines, acts, colWidth, hasUnassigned);
     drawPlotlineConnections(svg, nodePositions, plotlines);
     drawCrossPlotlineLinks(svg, nodePositions);
-    drawNodes(svg, nodePositions, app);
+    drawNodes(svg, nodePositions, app, shadowId);
     drawSessionTrack(svg, sessions, acts, colWidth, contentHeight, contentWidth, app, nodePositions);
 
     setupPanZoom(wrapper, svg);
@@ -303,7 +297,8 @@ function drawCrossPlotlineLinks(
 function drawNodes(
     svg: SVGElement,
     positions: NodePosition[],
-    app: App
+    app: App,
+    shadowId: string
 ): void {
     const group = createSVGElement("g", { class: "campaignitz-nodes" });
 
@@ -323,7 +318,7 @@ function drawNodes(
                 fill: pos.event.completed ? pos.plotline.color : "var(--background-primary)",
                 stroke: pos.plotline.color,
                 "stroke-width": "2.5",
-                filter: "url(#node-shadow)",
+                filter: `url(#${shadowId})`,
             })
         );
 

@@ -1,4 +1,4 @@
-import { ItemView, WorkspaceLeaf } from "obsidian";
+import { ItemView, WorkspaceLeaf, setIcon } from "obsidian";
 import type CampaignitzPlugin from "../main";
 import { parseCanonEvents, parseSessions } from "../services/parser";
 import { buildTimelineSVG, TimelineData } from "../components/TimelineSVG";
@@ -45,8 +45,8 @@ export class CampaignTimelineView extends ItemView {
         container.addClass("campaignitz-view");
 
         const header = container.createDiv({ cls: "campaignitz-header" });
-        const refreshBtn = header.createEl("button", { cls: "campaignitz-refresh-btn" });
-        refreshBtn.textContent = "Refresh";
+        const refreshBtn = header.createEl("button", { cls: "campaignitz-refresh-btn", attr: { "aria-label": "Refresh" } });
+        setIcon(refreshBtn, "refresh-cw");
         refreshBtn.addEventListener("click", () => { void this.render(); });
 
         const title = header.createEl("h4", { cls: "campaignitz-title" });
@@ -81,7 +81,14 @@ export class CampaignTimelineView extends ItemView {
 
         if (this.resizeObserver) this.resizeObserver.disconnect();
         let resizeTimer: number | null = null;
+        let lastWidth = timelineContainer.clientWidth;
         this.resizeObserver = new ResizeObserver(() => {
+            const w = timelineContainer.clientWidth;
+            if (w === lastWidth || w === 0 || lastWidth === 0) {
+                lastWidth = w;
+                return;
+            }
+            lastWidth = w;
             if (resizeTimer) window.clearTimeout(resizeTimer);
             resizeTimer = window.setTimeout(() => {
                 if (this.lastData) {

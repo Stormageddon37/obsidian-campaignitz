@@ -22,12 +22,16 @@
 }
 
 .campaignitz-refresh-btn {
-    font-size: 12px;
-    padding: 4px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
     cursor: pointer;
     border-radius: 4px;
-    border: 1px solid var(--background-modifier-border);
-    background: var(--background-secondary);
+    border: none;
+    background: transparent;
     color: var(--text-muted);
 }
 
